@@ -2,7 +2,7 @@ const term = require('terminal-kit').terminal;
 
 const wait = ms => new Promise(resolve => setTimeout(() => resolve(), ms));
 module.exports.getInput = str => new Promise((resolve, reject) => {
-    term.magenta(`${str}`);
+    term.green(`${str}`);
     term.inputField((error, input) => {
         if (error) {
             return reject(error);
@@ -13,7 +13,7 @@ module.exports.getInput = str => new Promise((resolve, reject) => {
 });
 
 module.exports.getMenuIndex = (str, items) => new Promise(async (resolve, reject) => {
-    term.magenta(`\n${str}\n`);
+    term.green(`\n${str}`);
     await wait(300);
     term.singleColumnMenu(items, (error, response) => {
         if (error) {

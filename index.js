@@ -7,10 +7,31 @@ const Client = require('./services/client');
 
 
 if (cluster.isMaster) {
-    /**
+    // ключ шифрования
+    const key = '123123123123';
+
+    /*
      * Запускаем тут клиента(отправителя)
      */
+
+    const client = new Client(0, key);
+
+    const sendRequet = async num => {
+        const recipients = Array(num).fill(0).map((v, i) => i + 1);
+        recipients.push(-1);
+        const recipient = await getMenuIndex('Выберите получателя: ', recipients);
+        const message = await getInput('Введите сообщение: ');
+        await client.sendRequest(recipient, message);
+
+        await sendRequet(num);
+    };
+
     (async () => {
+        term(`
+        Реализован RPC поверх TCP с минимальным функционалом
+        Голубым цветом в консоле пишут получатели
+        Желтым - отправители
+        `);
         term.grabInput();
         term.on('key', name => {
             if (name === 'CTRL_C') {
@@ -19,28 +40,24 @@ if (cluster.isMaster) {
             }
         });
         const num = parseInt(await getInput('Введите колличество получателей(<100): '));
-        const recipients = fork(num);
+
+        // инициализируем получателей
+        const recipients = fork(num, key);
         await wait(500);
-        await Client.init(recipients);
+        await client.init(recipients);
         await wait(500);
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-            const items = [
-                'a. Go south',
-                'b. Go west',
-                'c. Go back to the street',
-            ];
-            const index = await getMenuIndex('choose', items);
-            term.green(`\n${index}`);
-        }
+
+        // отсылаем запросы
+        await sendRequet(recipients.length);
     })();
 } else {
     /**
      * Запускаем тут сервера(получателей)
-     * передаём через process.env порт
+     * передаём через process.env порт, id, и ключ шифрования
      */
-    const {PORT} = process.env;
+    const {PORT, ID, KEY} = process.env;
+    const server = new Server(ID, PORT, KEY);
     (async () => {
-        await Server.init(PORT);
+        await server.init();
     })();
 }

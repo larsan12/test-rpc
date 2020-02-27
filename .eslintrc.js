@@ -21,6 +21,7 @@ module.exports = {
         "jest": true,
     },
     "rules": {
+        "id-length": "off",
         "require-jsdoc": "off",
         "no-async-promise-executor": "off",
         "array-callback-return": [
