@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "terminal-kit": "^1.33.15"
+    "terminal-kit": "^1.49.4"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
